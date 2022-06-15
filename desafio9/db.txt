@@ -1,0 +1,108 @@
+show dbs= "Para que me muestre todas las bases de datos"
+
+use ecomerce= "De esta forma cree la base de datos ecomerce"
+
+REALIZAR LAS COLECCIONES
+db.createCollection("productos")
+db.crearteCollection("mensajes")
+
+INSERCION DE DATOS Y CONSULTAS DB PRODUCTOS:
+*Mas de un dato
+db.mensajes.insertMany([
+                        {"usuario":"dany@dany","password":1234, "nombre":"Daniela", "texto":"hola"},
+                        {"usuario":"correo@correo","password":1235, "nombre":"Dan", "texto":"hola"}                        
+                        {"usuario":"Mar@Mar","password":1236, "nombre":"Martin", "texto":"hola"}
+                        {"usuario":"Hernan@Hernan","password":1237, "nombre":"Hernan", "texto":"hola"}
+                        {"usuario":"Elba@Elba","password":1238, "nombre":"Elba", "texto":"hola"}
+                        {"usuario":"Meli@Meli","password":1239, "nombre":"Melisa", "texto":"hola"}
+                        {"usuario":"Martu@Martu","password":12341, "nombre":"Martina", "texto":"hola"}
+                        {"usuario":"sof@sof","password":12342, "nombre":"Sofia", "texto":"hola"}
+                        {"usuario":"cam@cam","password":12343, "nombre":"Camila", "texto":"hola"}
+                        {"usuario":"Juany@Juany","password":12344, "nombre":"Juana", "texto":"hola"}
+                        ])
+
+ db.productos.insertMany([
+                        {"nombre":"Harry Potter", "precio": 100, "descripcion":"Novela"},
+                        {"nombre":"Las Mil y Una Noches", "precio": 1400, "descripcion":"Cuentos"},
+                        {"nombre":"Mi Planta de Naranja Lima", "precio": 2600, "descripcion":"Novela"},
+                        {"nombre":"El Señor de losAnillos", "precio": 600, "descripcion":"Novela"},
+                        {"nombre":"El Peregrino", "precio": 1000, "descripcion":"Novela"},
+                        {"nombre":"Don Quijote de la Mancha", "precio": 4000, "descripcion":"Novela"},
+                        {"nombre":"Los Juegos del Hambre", "precio": 3500, "descripcion":"Saga"},
+                        {"nombre":"La Rueda del Tiempo", "precio": 4800, "descripcion":"Saga"},
+                        {"nombre":"El Gran Libro de la Mitologia Griega", "precio": 5000, "descripcion":"Relatos"},
+                        {"nombre":"Mitologia Griega y Romana", "precio": 1500, "descripcion":"Relatos"},
+                        ])
+*Un solo dato
+db.productos.insertOne({"nombre":"Juegos de Tonos", "precio": 2300, "descripcion":"Cuentos"})
+db.mensajes.insertOne({"usuario":"Emm@Emm","password":12345, "nombre":"Emma", "texto":"hola"})
+
+*Listar todos los documentos de productos
+db.productos.find()
+db.mensajes.find()
+
+*Mostar la cantidad de documentos
+db.productos.estimatedDocumentCount()
+db.mensajes.estimatedDocumentCount()
+
+*Listar precio menores a 1000
+db.productos.find({"precio":{$lte:100}})
+
+*Listar precio entre 1000 y 3000
+db.productos.find({$and: [{"precio":{$gte:1000}}, {"precio":{$lte:3000}}]})
+
+*Listar precio mayor a 3000
+db.productos.find({"precio":{$gte:3000}})
+
+*Nombre de tercer producto mas barato----No pude traer solo el nombre, sino todo el objeto
+db.productos.find().pretty().sort({"precio":1}).skip(3).limit(1)
+
+*Hacer una actualización sobre todos los productos, agregando el campo stock a todos ellos con un valor de 100.
+ db.productos.updateMany({}, {$set: {stock: 100}}, false, true)
+
+*Cambiar el stock a cero de los productos con precios mayores a 4000 pesos
+db.productos.updateMany({precio: {$gt: 4000}}, {$set: {stock: 0}})
+
+*Borrar productos con precios mayores a 1000
+db.productos.deleteMany({precio: {$gte: 1000}})
+
+CREAR PERMISOS DE USUARIO
+-use admin
+-db.createUser({user:"pepe", pwd:"asd456", roles:[{role:"read", db:"ecomerce"}]})
+-show collections
+-db.system.users.find()
+
+[
+  {
+    _id: 'ecomerce.pepe',
+    userId: UUID("c0624ae5-2f09-4b5e-a369-c8af0897fd22"),
+    user: 'pepe',
+    db: 'ecomerce',
+    credentials: {
+      'SCRAM-SHA-1': {
+        iterationCount: 10000,
+        salt: 'J2e2qViVywbLEHSQmyH9xw==',
+        storedKey: 'uErUXM8lLk+aD67bnsOGE/LwzbY=',
+        serverKey: 'D4xRFE+m/7j2+TnqA4oedq7rg5w='
+      },
+      'SCRAM-SHA-256': {
+        iterationCount: 15000,
+        salt: '4FQXY0iInXxU3qQfPnGmJzUkjuyTdYKkjDq+FA==',
+        storedKey: '4X/83p4H+YbxfqiVbEg/ON27ovilyyeEUacUO/PImms=',
+        serverKey: 'QQTEKU5eTqWezlMBhxtlzorQk2pdKqLm9c0vInDY0vQ='
+      }
+    },
+    roles: [ { role: 'read', db: 'ecomerce' } ]
+  }
+]
+
+*Verificar que no pueda cambiar la informacio
+No pude ingresar al usuario poniendo mongo -u "pepe" -p "asd456"
+
+SyntaxError: Missing semicolon. (1:8)
+
+> 1 | mongo -u "pepe" -p "asd456"
+    |         ^
+  2 |
+
+
